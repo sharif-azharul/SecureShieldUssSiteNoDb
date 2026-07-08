@@ -1,0 +1,41 @@
+@using SecureShield.Application.Services
+@using SecureShield.Web.Components.Shared
+@inject ILocalizationService L
+
+<header class="site-header">
+    <div class="utility-bar">
+        <div class="container-pad">
+            <span>📞 <a href="tel:+8801700000000">@L["header.phone"]</a></span>
+            <span style="opacity: 0.4;">|</span>
+            <span>✉ <a href="mailto:info@uss-security.com.bd">@L["header.email"]</a></span>
+            <span style="margin-left: auto; color: var(--gold); font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase;">
+                ● @L["header.licensed"]
+            </span>
+        </div>
+    </div>
+    <div class="header-main">
+        <div class="container-pad nav-wrap">
+            <a href="/" class="brand">
+                <img src="/uss-logo.svg" alt="USS Security Services Ltd." />
+            </a>
+            <nav class="main-nav">
+                <a href="#home">@L["nav.home"]</a>
+                <a href="#about">@L["nav.about"]</a>
+                <a href="#public-services">@L["nav.services"]</a>
+                <a href="#process">@L["nav.process"]</a>
+                <a href="#industries">@L["nav.industries"]</a>
+                <a href="#why">@L["nav.why"]</a>
+                <a href="#public-guards">@L["nav.guards"]</a>
+                <a href="#training">@L["nav.training"]</a>
+                <a href="#gallery">@L["nav.gallery"]</a>
+                <a href="#career">@L["nav.career"]</a>
+                <a href="#contact">@L["nav.contact"]</a>
+            </nav>
+            <div class="nav-actions">
+                <LanguageToggle />
+                <a href="/admin/login" class="btn-admin" title="Admin Panel">@L["nav.admin"]</a>
+                <a href="#contact" class="btn-gold">@L["nav.quote"]</a>
+            </div>
+        </div>
+    </div>
+</header>

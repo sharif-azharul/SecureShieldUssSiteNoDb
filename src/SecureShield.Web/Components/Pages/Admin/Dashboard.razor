@@ -1,0 +1,113 @@
+@page "/admin/dashboard"
+@layout AdminLayout
+@using SecureShield.Application.DTOs
+@using SecureShield.Application.Interfaces
+@inject ICareerRepository Careers
+@inject IContactMessageRepository Messages
+@inject IServiceRepository Services
+@inject IClientRepository Clients
+@inject IGalleryRepository Gallery
+@inject ITestimonialRepository Testimonials
+@inject IGuardRepository Guards
+@inject NavigationManager Nav
+
+<MudText Typo="Typo.h4" Style="color: #0B1F3A; font-weight: 700;">Dashboard</MudText>
+<MudText Typo="Typo.body1" Color="Color.Surface" Class="mb-6">Quick overview of your website activity.</MudText>
+
+<MudGrid Class="mt-4">
+    <MudItem md="3" sm="6" xs="12">
+        <MudPaper Class="pa-5" Elevation="2" Style="border-radius: 16px;">
+            <MudAvatar Color="Color.Primary" Style="background: linear-gradient(135deg, #0B1F3A, #142E55);">
+                <MudIcon Icon="@Icons.Material.Filled.Shield" />
+            </MudAvatar>
+            <MudText Typo="Typo.h3" Style="color: #0B1F3A; font-weight: 700;" Class="mt-3">@_stats.Services</MudText>
+            <MudText Typo="Typo.caption" Color="Color.Surface">SERVICES</MudText>
+        </MudPaper>
+    </MudItem>
+    <MudItem md="3" sm="6" xs="12">
+        <MudPaper Class="pa-5" Elevation="2" Style="border-radius: 16px;">
+            <MudAvatar Style="background: linear-gradient(135deg, #A47E2A, #C89B3C);">
+                <MudIcon Icon="@Icons.Material.Filled.Apartment" />
+            </MudAvatar>
+            <MudText Typo="Typo.h3" Style="color: #0B1F3A; font-weight: 700;" Class="mt-3">@_stats.Clients</MudText>
+            <MudText Typo="Typo.caption" Color="Color.Surface">CLIENTS</MudText>
+        </MudPaper>
+    </MudItem>
+    <MudItem md="3" sm="6" xs="12">
+        <MudPaper Class="pa-5" Elevation="2" Style="border-radius: 16px;">
+            <MudAvatar Style="background: linear-gradient(135deg, #B71C1C, #D32F2F);">
+                <MudIcon Icon="@Icons.Material.Filled.Work" />
+            </MudAvatar>
+            <MudText Typo="Typo.h3" Style="color: #0B1F3A; font-weight: 700;" Class="mt-3">@_stats.Careers</MudText>
+            <MudText Typo="Typo.caption" Color="Color.Surface">CAREER APPLICATIONS</MudText>
+        </MudPaper>
+    </MudItem>
+    <MudItem md="3" sm="6" xs="12">
+        <MudPaper Class="pa-5" Elevation="2" Style="border-radius: 16px;">
+            <MudAvatar Style="background: linear-gradient(135deg, #0B1F3A, #142E55);">
+                <MudIcon Icon="@Icons.Material.Filled.Mail" />
+            </MudAvatar>
+            <MudText Typo="Typo.h3" Style="color: #0B1F3A; font-weight: 700;" Class="mt-3">@_stats.Messages</MudText>
+            <MudText Typo="Typo.caption" Color="Color.Surface">CONTACT MESSAGES</MudText>
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+
+<MudGrid Class="mt-4">
+    <MudItem md="6" xs="12">
+        <MudPaper Class="pa-5" Elevation="2" Style="border-radius: 16px;">
+            <MudText Typo="Typo.h6" Style="color: #0B1F3A; font-weight: 700;">New Career Applications</MudText>
+            <MudText Typo="Typo.h2" Style="color: #D32F2F; font-weight: 700;">@_stats.NewCareers</MudText>
+            <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(() => Nav.NavigateTo("/admin/careers"))">View all →</MudButton>
+        </MudPaper>
+    </MudItem>
+    <MudItem md="6" xs="12">
+        <MudPaper Class="pa-5" Elevation="2" Style="border-radius: 16px;">
+            <MudText Typo="Typo.h6" Style="color: #0B1F3A; font-weight: 700;">Unread Messages</MudText>
+            <MudText Typo="Typo.h2" Style="color: #C89B3C; font-weight: 700;">@_stats.UnreadMessages</MudText>
+           @*  <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(() => Nav.NavigateTo("/admin/messages"))">View all →</MudButton> *@
+            <MudButton Variant="Variant.Text"
+                       Color="Color.Primary"
+                       OnClick="GoToMessages">
+                View all →
+            </MudButton>
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       OnClick="@Test">
+                Test
+            </MudButton>
+            <MudText>@_message</MudText>
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+
+@code {
+    private DashboardStatsDto _stats = new(0, 0, 0, 0, 0, 0, 0, 0, 0);
+    private async Task GoToMessages()
+    {
+        Nav.NavigateTo("/admin/messages");
+    }
+    private string _message = "";
+
+    private void Test()
+    {
+        _message = "Clicked";
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        var services = await Services.GetAllAsync();
+        var clients = await Clients.GetAllAsync();
+        var gallery = await Gallery.GetAllAsync();
+        var testimonials = await Testimonials.GetAllAsync();
+        var careers = await Careers.GetAllAsync();
+        var messages = await Messages.GetAllAsync();
+        var guards = await Guards.GetAllAsync();
+        var newCareers = await Careers.CountNewAsync();
+        var unread = await Messages.CountUnreadAsync();
+
+        _stats = new DashboardStatsDto(
+            services.Count(), clients.Count(), gallery.Count(), testimonials.Count(),
+            careers.Count(), messages.Count(), guards.Count(), newCareers, unread);
+    }
+    
+}

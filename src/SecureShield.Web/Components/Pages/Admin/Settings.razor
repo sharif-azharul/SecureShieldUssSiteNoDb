@@ -1,0 +1,36 @@
+@page "/admin/settings"
+@layout AdminLayout
+@using SecureShield.Application.Interfaces
+@inject ISiteSettingRepository Settingss
+@inject IUnitOfWork Uow
+
+<MudText Typo="Typo.h4" Style="color: #0B1F3A; font-weight: 700;">Website Settings</MudText>
+
+@foreach (var s in _items)
+{
+    <MudPaper Class="pa-4 mt-3" Elevation="2" Style="border-radius: 12px;">
+        <MudText Typo="Typo.caption" Style="color: #5B6878; text-transform: uppercase; letter-spacing: 1px;">@s.Key</MudText>
+        <div style="display: flex; gap: 8px; margin-top: 8px;">
+            <MudTextField @bind-Value="s.Value"
+                          Variant="Variant.Outlined"
+                          Class="flex-grow-1" />
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => Save(s))">Save</MudButton>
+        </div>
+    </MudPaper>
+}
+
+@code {
+    private List<SecureShield.Domain.Entities.SiteSetting> _items = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var all = await Settingss.GetAllAsync();
+        _items = all.Where(s => s.Key.StartsWith("site.")).ToList();
+    }
+
+    private async Task Save(SecureShield.Domain.Entities.SiteSetting s)
+    {
+        await Settingss.UpsertAsync(s.Key, s.Value);
+        await Uow.SaveChangesAsync();
+    }
+}

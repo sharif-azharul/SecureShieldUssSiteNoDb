@@ -1,0 +1,34 @@
+@using SecureShield.Application.Interfaces
+@using SecureShield.Application.Services
+@inject IServiceRepository Servicess
+@inject ILocalizationService L
+
+<section id="public-services" class="section-pad">
+    <div class="container-pad">
+        <div class="section-heading" style="text-align: center; max-width: 760px; margin: 0 auto 60px;" data-reveal>
+            <div class="heading-label center"><span class="label-line"></span><span class="label-text">@L["services.label"]</span><span class="label-line"></span></div>
+            <h2 class="heading-title">@L["services.title"]</h2>
+            <p class="heading-sub" style="margin-left: auto; margin-right: auto;">@L["services.sub"]</p>
+            <div class="heading-divider center"></div>
+        </div>
+        <div class="grid-4" data-reveal>
+            @foreach (var s in _services)
+            {
+                <article class="card-premium">
+                    <div style="display: flex; align-items: flex-start; justify-content: space-between;">
+                        <div class="card-icon-gold">@GetIconEmoji(s.Icon)</div>
+                        @if (s.Featured) { <span style="width: 10px; height: 10px; border-radius: 50%; background: var(--gold);"></span> }
+                    </div>
+                    <h3 class="card-title">@L.T(s.TitleEn, s.TitleBn)</h3>
+                    <p class="card-desc">@L.T(s.DescriptionEn, s.DescriptionBn)</p>
+                </article>
+            }
+        </div>
+    </div>
+</section>
+
+@code {
+    private IEnumerable<SecureShield.Domain.Entities.Service> _services = new List<SecureShield.Domain.Entities.Service>();
+    protected override async Task OnInitializedAsync() => _services = await Servicess.GetAllAsync();
+    private string GetIconEmoji(string icon) => icon switch { "Factory" => "🏭", "Building2" => "🏢", "Landmark" => "🏦", "Hospital" => "🏥", "Home" => "🏠", "ShoppingBag" => "🛍️", "Warehouse" => "📦", "HardHat" => "👷", "Crown" => "👑", "UserCheck" => "🛡️", "Calendar" => "📅", "ClipboardCheck" => "📋", "Flame" => "🔥", "Cctv" => "📹", "Lightbulb" => "💡", _ => "🛡️" };
+}

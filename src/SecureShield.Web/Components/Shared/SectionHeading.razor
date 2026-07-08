@@ -1,0 +1,27 @@
+@using SecureShield.Application.Services
+@inject ILocalizationService L
+
+<div class="section-heading" style="text-align: @(Align == "center" ? "center" : "left"); max-width: 720px; @(Align == "center" ? "margin: 0 auto;" : "")">
+    @if (!string.IsNullOrEmpty(Label))
+    {
+        <div class="heading-label" style="justify-content: @(Align == "center" ? "center" : "flex-start");">
+            <span class="label-line"></span>
+            <span class="label-text">@Label</span>
+            <span class="label-line"></span>
+        </div>
+    }
+    <h2 class="heading-title" style="color: @(Light ? "white" : "#0B1F3A");">@Title</h2>
+    @if (!string.IsNullOrEmpty(Subtitle))
+    {
+        <p class="heading-sub" style="color: @(Light ? "rgba(231,235,241,0.8)" : "#5B6878");">@Subtitle</p>
+    }
+    <div class="heading-divider" style="margin: @(Align == "center" ? "20px auto 0" : "20px 0 0");"></div>
+</div>
+
+@code {
+    [Parameter] public string? Label { get; set; }
+    [Parameter] public string Title { get; set; } = "";
+    [Parameter] public string? Subtitle { get; set; }
+    [Parameter] public string Align { get; set; } = "center";
+    [Parameter] public bool Light { get; set; }
+}

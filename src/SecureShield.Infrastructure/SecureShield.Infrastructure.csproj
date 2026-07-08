@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>SecureShield.Infrastructure</RootNamespace>
+    <AssemblyName>SecureShield.Infrastructure</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- JWT for admin token auth (no database needed) -->
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.0" />
+    <!-- MailKit for SMTP email -->
+    <PackageReference Include="MailKit" Version="4.17.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SecureShield.Application\SecureShield.Application.csproj" />
+    <ProjectReference Include="..\SecureShield.Domain\SecureShield.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

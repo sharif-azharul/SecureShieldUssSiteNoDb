@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>SecureShield.Domain</RootNamespace>
+    <AssemblyName>SecureShield.Domain</AssemblyName>
+  </PropertyGroup>
+
+  <!--
+    The Domain layer stays dependency-free per Clean Architecture.
+    AdminUser is a plain POCO; Identity integration lives in Infrastructure.
+  -->
+
+</Project>

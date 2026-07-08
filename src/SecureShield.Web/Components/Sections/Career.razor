@@ -1,0 +1,206 @@
+@using FluentValidation
+@using Microsoft.AspNetCore.Components.Forms
+@using SecureShield.Application.DTOs
+@using SecureShield.Application.Services
+@inject ICareerRepository Careers
+@inject IEmailService Email
+@inject IUnitOfWork Uow
+@inject IConfiguration Config
+@inject IValidator<CareerApplicationDto> Validator
+@inject ILocalizationService L
+
+<section id="career" class="section-pad" style="background: var(--bg);">
+    <div class="container-pad">
+        <div class="section-heading" style="text-align: center; max-width: 760px; margin: 0 auto 60px;" data-reveal>
+            <div class="heading-label center">
+                <span class="label-line"></span>
+                <span class="label-text">@L["career.label"]</span>
+                <span class="label-line"></span>
+            </div>
+            <h2 class="heading-title">@L["career.title"]</h2>
+            <p class="heading-sub" style="margin-left: auto; margin-right: auto;">
+                @L["career.sub"]
+            </p>
+            <div class="heading-divider center"></div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-4" data-reveal-left>
+                <div style="background: var(--grad-black); padding: 36px; border-radius: 16px; color: white; height: 100%; border-top: 4px solid var(--gold);">
+                    <h3 style="color: white; font-size: 22px; font-family: var(--font-head); margin: 0 0 16px;">@L["career.whyTitle"]</h3>
+                    <div style="height: 3px; width: 48px; background: var(--gold); border-radius: 3px; margin-bottom: 24px;"></div>
+                    <ul style="list-style: none; padding: 0; margin: 0; font-size: 14px; line-height: 1.8;">
+                        @foreach (var b in _benefits)
+                        {
+                            <li style="margin-bottom: 14px; display: flex; gap: 12px; align-items: flex-start;">
+                                <span style="color: var(--gold); flex-shrink: 0; font-size: 16px;">@b.Icon</span>
+                                <span style="color: rgba(255,255,255,0.85);">@L[b.Text]</span>
+                            </li>
+                        }
+                    </ul>
+                    <div style="margin-top: 28px; padding: 16px; background: rgba(200,162,58,0.08); border-radius: 10px; border: 1px solid rgba(200,162,58,0.2);">
+                        <p style="font-weight: 700; color: var(--gold); margin: 0; font-size: 13px; font-family: var(--font-head);">@L["career.hrHelpline"]</p>
+                        <p style="margin: 6px 0 0; color: rgba(255,255,255,0.85); font-size: 13px;">📞 +880 1700-000111</p>
+                        <p style="margin: 2px 0 0; color: rgba(255,255,255,0.85); font-size: 13px;">✉ hr@uss-security.com.bd</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-8" data-reveal>
+                <EditForm Model="@_model" OnValidSubmit="@Submit">
+                    <DataAnnotationsValidator />
+                    <div class="form-card">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label">@L["career.form.name"] *</label>
+                                <InputText class="form-input" @bind-Value="_model.Name" placeholder="Md. Karim Rahman" />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">@L["career.form.phone"] *</label>
+                                <InputText class="form-input" @bind-Value="_model.Phone" placeholder="01XXXXXXXXX" />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">@L["career.form.email"] *</label>
+                                <InputText class="form-input" @bind-Value="_model.Email" placeholder="you@example.com" />
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">@L["career.form.address"] *</label>
+                                <InputTextArea class="form-input" @bind-Value="_model.Address" rows="2" placeholder="House, Road, Area, District" />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">@L["career.form.education"] *</label>
+                                <InputText class="form-input" @bind-Value="_model.Education" placeholder="SSC / HSC / Bachelor's" />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">@L["career.form.experience"] *</label>
+                                <InputText class="form-input" @bind-Value="_model.Experience" placeholder="e.g. 3 years" />
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">@L["career.form.position"] *</label>
+                                <InputSelect class="form-input" @bind-Value="_model.Position">
+                                    <option value="">@L["career.form.selectPosition"]</option>
+                                    <option value="guard">@L["career.position.guard"]</option>
+                                    <option value="armed">@L["career.position.armed"]</option>
+                                    <option value="vip">@L["career.position.vip"]</option>
+                                    <option value="supervisor">@L["career.position.supervisor"]</option>
+                                    <option value="control">@L["career.position.control"]</option>
+                                </InputSelect>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">@L["career.form.cv"]</label>
+                                <InputFile OnChange="@OnFileChange" accept=".pdf,.doc,.docx" class="form-input" style="padding: 12px;" />
+                                @if (!string.IsNullOrEmpty(_model.CvFileName))
+                                {
+                                    <small style="color: var(--gold-dark); font-weight: 600;">📎 @_model.CvFileName</small>
+                                }
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-gold" style="width: 100%; margin-top: 24px; justify-content: center;" disabled="@_loading">
+                            @(_loading ? "..." : $"{L["career.form.submit"]} →")
+                        </button>
+                        @if (!string.IsNullOrEmpty(_statusMessage))
+                        {
+                            <div style="margin-top: 16px; padding: 14px 18px; border-radius: 10px; background: @(_success ? "rgba(46,125,50,0.1)" : "rgba(198,40,40,0.1)"); color: @(_success ? "var(--success)" : "var(--danger)"); font-size: 14px; border-left: 3px solid @(_success ? "var(--success)" : "var(--danger)");">
+                                @_statusMessage
+                            </div>
+                        }
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+</section>
+
+@code {
+    private CareerApplicationDto _model = new CareerApplicationDto();
+    private bool _loading;
+    private string? _statusMessage;
+    private bool _success;
+
+    private record Benefit(string Icon, string Text);
+    private readonly List<Benefit> _benefits = new()
+    {
+        new("🏆", "career.benefit1"),
+        new("🎓", "career.benefit2"),
+        new("💼", "career.benefit3"),
+        new("🗺️", "career.benefit4"),
+        new("👤", "career.benefit5"),
+    };
+
+    private async Task OnFileChange(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+
+        if (file == null)
+            return;
+
+        if (file.Size > 5 * 1024 * 1024)
+        {
+            _statusMessage = "File too large (max 5MB)";
+            _success = false;
+            return;
+        }
+
+        using var ms = new MemoryStream();
+
+        await file.OpenReadStream(maxAllowedSize: 5 * 1024 * 1024)
+                  .CopyToAsync(ms);
+
+        _model.CvFileName = file.Name;
+        _model.CvFileBase64 = Convert.ToBase64String(ms.ToArray());
+    }
+
+    private async Task Submit()
+    {
+        _loading = true;
+        try
+        {
+            var validation = await Validator.ValidateAsync(_model);
+            if (!validation.IsValid)
+            {
+                _statusMessage = string.Join("; ", validation.Errors.Select(e => e.ErrorMessage));
+                _success = false;
+                return;
+            }
+
+            var cvPath = !string.IsNullOrEmpty(_model.CvFileName) ? $"/uploads/cv/{Guid.NewGuid()}_{_model.CvFileName}" : null;
+
+            await Careers.AddAsync(new SecureShield.Domain.Entities.CareerApplication
+            {
+                Name = _model.Name,
+                Phone = _model.Phone,
+                Email = _model.Email,
+                Address = _model.Address,
+                Education = _model.Education,
+                Experience = _model.Experience,
+                Position = _model.Position,
+                CvFileName = _model.CvFileName,
+                CvFilePath = cvPath,
+            });
+            await Uow.SaveChangesAsync();
+
+            var hrEmail = Config["Site:HrEmail"] ?? "hr@uss-security.com.bd";
+            var html = EmailTemplates.CareerNotification(_model.Name, _model.Phone, _model.Email,
+                _model.Position, _model.Education, _model.Experience, _model.Address, _model.CvFileName);
+            await Email.SendEmailAsync(
+                hrEmail,
+                "noreply@uss-security.com.bd",
+                _model.Email,
+                $"New career application — {_model.Position}",
+                $"New application:\n\nName: {_model.Name}\nPhone: {_model.Phone}\nEmail: {_model.Email}\nPosition: {_model.Position}\nEducation: {_model.Education}\nExperience: {_model.Experience}\nAddress: {_model.Address}\nCV: {_model.CvFileName ?? "—"}",
+                html);
+
+            _statusMessage = L["career.success"];
+            _success = true;
+            _model = new CareerApplicationDto();
+        }
+        catch (Exception ex)
+        {
+            _statusMessage = "Failed: " + ex.Message;
+            _success = false;
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+}

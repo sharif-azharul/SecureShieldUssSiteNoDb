@@ -1,0 +1,60 @@
+@page "/admin/messages"
+@layout AdminLayout
+@using SecureShield.Application.Interfaces
+@inject IContactMessageRepository Messagess
+@inject IUnitOfWork Uow
+
+<MudText Typo="Typo.h4" Style="color: #0B1F3A; font-weight: 700;">Contact Messages (@_items.Count)</MudText>
+
+@foreach (var m in _items)
+{
+    <MudPaper Class="pa-5 mt-4" Elevation="2" Style="border-radius: 16px;">
+        <div style="display: flex; flex-wrap: wrap; gap: 16px; justify-content: space-between; align-items: flex-start;">
+            <div style="flex: 1; min-width: 0;">
+                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                    <MudText Typo="Typo.h6" Style="color: #0B1F3A; font-weight: 700;">@m.Subject</MudText>
+                    @if (!m.IsRead)
+                    {
+                        <MudChip T="string" Color="Color.Error" Size="Size.Small">New</MudChip>
+                    }
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; font-size: 14px; color: #5B6878;">
+                    <span><strong style="color:#0B1F3A;">From:</strong> @m.Name</span>
+                    <span><strong style="color:#0B1F3A;">Company:</strong> @(m.Company ?? "—")</span>
+                    <span>📞 @m.Phone</span>
+                    <span>✉ @m.Email</span>
+                </div>
+                <div style="margin-top: 12px; padding: 12px; background: #F8F9FA; border-radius: 8px; color: #0B1F3A; font-size: 14px;">@m.Message</div>
+                <MudText Typo="Typo.caption" Style="color: #9CA3AF;">@m.CreatedAt.ToLocalTime().ToString("g")</MudText>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+                @if (!m.IsRead)
+                {
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => MarkRead(m))" Size="Size.Small">Mark read</MudButton>
+                }
+                <MudButton Variant="Variant.Filled" Color="Color.Warning" Href="@($"mailto:{m.Email}")" Target="_blank" Size="Size.Small">Reply</MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="@(() => Delete(m))" Size="Size.Small">Delete</MudButton>
+            </div>
+        </div>
+    </MudPaper>
+}
+
+@code {
+    private List<SecureShield.Domain.Entities.ContactMessage> _items = new();
+
+    protected override async Task OnInitializedAsync() => _items = (await Messagess.GetAllAsync()).ToList();
+
+    private async Task MarkRead(SecureShield.Domain.Entities.ContactMessage m)
+    {
+        await Messagess.MarkReadAsync(m.Id);
+        await Uow.SaveChangesAsync();
+        m.IsRead = true;
+    }
+
+    private async Task Delete(SecureShield.Domain.Entities.ContactMessage m)
+    {
+        await Messagess.DeleteAsync(m.Id);
+        await Uow.SaveChangesAsync();
+        _items.Remove(m);
+    }
+}

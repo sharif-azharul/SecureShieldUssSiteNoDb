@@ -1,0 +1,72 @@
+@page "/admin/guards"
+@layout AdminLayout
+@using SecureShield.Application.Interfaces
+@inject IGuardRepository Guardss
+@inject IUnitOfWork Uow
+
+<MudText Typo="Typo.h4" Style="color: #0B1F3A; font-weight: 700;">Manage Guards (@_items.Count)</MudText>
+<MudButton Variant="Variant.Filled" Color="Color.Primary" Class="mt-4" OnClick="@ShowAdd">+ Add New</MudButton>
+
+@if (_showForm)
+{
+    <MudPaper Class="pa-5 mt-4" Elevation="2" Style="border-radius: 16px;">
+        <MudText Typo="Typo.h6" Style="color: #0B1F3A; font-weight: 700;">New Guard</MudText>
+        <div class="row g-3 mt-2">
+            <div class="col-md-6"><MudTextField Label="Name" @bind-Value="_form.Name" Variant="Variant.Outlined" /></div>
+            <div class="col-md-6"><MudTextField Label="Role" @bind-Value="_form.Role" Variant="Variant.Outlined" /></div>
+            <div class="col-md-6">
+                <MudSelect Label="Category" @bind-Value="_form.Category" Variant="Variant.Outlined">
+                    <MudSelectItem Value="@("male")">Male</MudSelectItem>
+                    <MudSelectItem Value="@("female")">Female</MudSelectItem>
+                    <MudSelectItem Value="@("armed")">Armed</MudSelectItem>
+                    <MudSelectItem Value="@("vip")">VIP</MudSelectItem>
+                    <MudSelectItem Value="@("supervisor")">Supervisor</MudSelectItem>
+                </MudSelect>
+            </div>
+            <div class="col-md-6"><MudTextField Label="Image URL" @bind-Value="_form.ImageUrl" Variant="Variant.Outlined" /></div>
+        </div>
+        <div class="mt-3">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@Save">Save</MudButton>
+            <MudButton Variant="Variant.Text" OnClick="@(() => _showForm = false)">Cancel</MudButton>
+        </div>
+    </MudPaper>
+}
+
+<div class="row g-3 mt-2">
+    @foreach (var g in _items)
+    {
+        <div class="col-md-3 col-lg-2">
+            <MudPaper Class="pa-3" Elevation="2" Style="border-radius: 16px; height: 100%; text-align: center;">
+                <img src="@g.ImageUrl" alt="@g.Name" style="width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 12px;" />
+                <MudText Typo="Typo.subtitle2" Style="color: #0B1F3A; font-weight: 700; margin-top: 8px;">@g.Name</MudText>
+                <MudText Typo="Typo.caption" Color="Color.Surface">@g.Category</MudText>
+                <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(() => Delete(g))" />
+            </MudPaper>
+        </div>
+    }
+</div>
+
+@code {
+    private List<SecureShield.Domain.Entities.GuardProfile> _items = new();
+    private bool _showForm;
+    private SecureShield.Domain.Entities.GuardProfile _form = new();
+
+    protected override async Task OnInitializedAsync() => _items = (await Guardss.GetAllAsync()).ToList();
+
+    private void ShowAdd() { _form = new SecureShield.Domain.Entities.GuardProfile(); _showForm = true; }
+
+    private async Task Save()
+    {
+        await Guardss.AddAsync(_form);
+        await Uow.SaveChangesAsync();
+        _items.Add(_form);
+        _showForm = false;
+    }
+
+    private async Task Delete(SecureShield.Domain.Entities.GuardProfile g)
+    {
+        await Guardss.DeleteAsync(g.Id);
+        await Uow.SaveChangesAsync();
+        _items.Remove(g);
+    }
+}

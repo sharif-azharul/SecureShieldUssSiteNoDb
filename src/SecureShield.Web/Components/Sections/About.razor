@@ -1,0 +1,50 @@
+@using SecureShield.Application.Services
+@inject ILocalizationService L
+
+<section id="about" class="section-pad">
+    <div class="container-pad">
+        <div class="row g-5 align-items-center">
+            <div class="col-lg-6" data-reveal-left>
+                <div style="position: relative;">
+                    <div style="overflow: hidden; border-radius: 16px; box-shadow: var(--shadow-lg); border-bottom: 4px solid var(--gold);">
+                        <img src="/images/about.jpg" alt="USS Security team briefing" style="aspect-ratio: 4/5; width: 100%; object-fit: cover;" />
+                    </div>
+                    <div style="position: absolute; bottom: -28px; right: -16px; background: var(--card); padding: 22px 26px; border-radius: 14px; box-shadow: var(--shadow-lg); border-top: 3px solid var(--gold);">
+                        <div style="display: flex; gap: 14px; align-items: center;">
+                            <div style="width: 52px; height: 52px; border-radius: 12px; background: rgba(200,162,58,0.1); color: var(--gold); display: flex; align-items: center; justify-content: center; font-size: 24px;">🛡️</div>
+                            <div>
+                                <div style="font-family: var(--font-head); font-size: 30px; font-weight: 800; color: var(--black); line-height: 1;">15+</div>
+                                <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; margin-top: 4px;">@L["about.yearsLabel"]</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6" data-reveal>
+                <div class="heading-label"><span class="label-line"></span><span class="label-text">@L["about.label"]</span></div>
+                <h2 class="heading-title" style="margin-top: 14px;">@L["about.title"]</h2>
+                <div class="heading-divider"></div>
+                <p style="margin-top: 28px; line-height: 1.8; color: var(--text-muted);">@L["about.p1"]</p>
+                <p style="margin-top: 16px; line-height: 1.8; color: var(--text-muted);">@L["about.p2"]</p>
+                <div style="margin-top: 32px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                    @for (var i = 1; i <= 4; i++) { var idx = i;
+                        <div style="display: flex; gap: 14px; padding: 14px; background: var(--card); border-radius: 10px; box-shadow: var(--shadow-sm); border-left: 3px solid var(--gold);">
+                            <div style="width: 36px; height: 36px; border-radius: 8px; background: rgba(200,162,58,0.1); color: var(--gold); display: flex; align-items: center; justify-content: center; font-size: 16px;">@(new[] { "🛡️", "✅", "📄", "🗺️" }[idx - 1])</div>
+                            <span style="font-size: 13px; font-weight: 600; color: var(--black); padding-top: 4px;">@L[$"about.bullet{idx}"]</span>
+                        </div>
+                    }
+                </div>
+                <div style="margin-top: 36px; display: grid; grid-template-columns: 1fr 1fr; gap: 18px;">
+                    <div style="border-left: 3px solid var(--gold); background: var(--card); padding: 22px; border-radius: 12px; box-shadow: var(--shadow-sm);">
+                        <div style="display: flex; align-items: center; gap: 10px;"><span style="color: var(--gold); font-size: 18px;">🎯</span><h4 style="color: var(--black); margin: 0; font-size: 16px;">@L["about.mission"]</h4></div>
+                        <p style="font-size: 13px; line-height: 1.7; color: var(--text-muted); margin: 12px 0 0;">@L["about.missionText"]</p>
+                    </div>
+                    <div style="border-left: 3px solid var(--gold); background: var(--card); padding: 22px; border-radius: 12px; box-shadow: var(--shadow-sm);">
+                        <div style="display: flex; align-items: center; gap: 10px;"><span style="color: var(--gold); font-size: 18px;">👁</span><h4 style="color: var(--black); margin: 0; font-size: 16px;">@L["about.vision"]</h4></div>
+                        <p style="font-size: 13px; line-height: 1.7; color: var(--text-muted); margin: 12px 0 0;">@L["about.visionText"]</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

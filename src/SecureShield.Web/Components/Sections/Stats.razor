@@ -1,0 +1,15 @@
+@using SecureShield.Application.Services
+@inject ILocalizationService L
+
+<section class="stats">
+    <div class="container-pad">
+        <div class="stats-card">
+            <div class="stats-grid">
+                <div class="stat"><div class="stat-value" data-counter="500" data-suffix="+">500+</div><div class="stat-label">@L["stats.guards"]</div></div>
+                <div class="stat"><div class="stat-value" data-counter="200" data-suffix="+">200+</div><div class="stat-label">@L["stats.clients"]</div></div>
+                <div class="stat"><div class="stat-value" data-counter="15" data-suffix="+">15+</div><div class="stat-label">@L["stats.experience"]</div></div>
+                <div class="stat"><div class="stat-value" data-counter="98" data-suffix="%">98%</div><div class="stat-label">@L["stats.satisfaction"]</div></div>
+            </div>
+        </div>
+    </div>
+</section>

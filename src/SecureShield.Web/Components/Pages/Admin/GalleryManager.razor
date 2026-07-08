@@ -1,0 +1,73 @@
+@page "/admin/gallery"
+@layout AdminLayout
+@using SecureShield.Application.Interfaces
+@inject IGalleryRepository Gallery
+@inject IUnitOfWork Uow
+
+<MudText Typo="Typo.h4" Style="color: #0B1F3A; font-weight: 700;">Manage Gallery (@_items.Count)</MudText>
+<MudButton Variant="Variant.Filled" Color="Color.Primary" Class="mt-4" OnClick="@ShowAdd">+ Add New</MudButton>
+
+@if (_showForm)
+{
+    <MudPaper Class="pa-5 mt-4" Elevation="2" Style="border-radius: 16px;">
+        <MudText Typo="Typo.h6" Style="color: #0B1F3A; font-weight: 700;">New Gallery Item</MudText>
+        <div class="row g-3 mt-2">
+            <div class="col-md-6"><MudTextField Label="Title" @bind-Value="_form.Title" Variant="Variant.Outlined" /></div>
+            <div class="col-md-6">
+                <MudSelect Label="Category" @bind-Value="_form.Category" Variant="Variant.Outlined">
+                    <MudSelectItem Value="@("duty")">Guard Duty</MudSelectItem>
+                    <MudSelectItem Value="@("training")">Training</MudSelectItem>
+                    <MudSelectItem Value="@("events")">Events</MudSelectItem>
+                    <MudSelectItem Value="@("office")">Office</MudSelectItem>
+                </MudSelect>
+            </div>
+            <div class="col-12"><MudTextField Label="Image URL" @bind-Value="_form.ImageUrl" Variant="Variant.Outlined" /></div>
+            <div class="col-12"><MudTextField Label="Caption" @bind-Value="_form.Caption" Variant="Variant.Outlined" /></div>
+        </div>
+        <div class="mt-3">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@Save">Save</MudButton>
+            <MudButton Variant="Variant.Text" OnClick="@(() => _showForm = false)">Cancel</MudButton>
+        </div>
+    </MudPaper>
+}
+
+<div class="row g-3 mt-2">
+    @foreach (var g in _items)
+    {
+        <div class="col-md-3 col-lg-2">
+            <MudPaper Class="pa-2" Elevation="2" Style="border-radius: 12px; height: 100%;">
+                <img src="@g.ImageUrl" alt="@g.Title" style="width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px;" />
+                <MudText Typo="Typo.caption" Style="color: #0B1F3A; font-weight: 600;">@g.Title</MudText>
+                <MudChip T="string" Size="Size.Small" Color="Color.Info" Class="mt-1">@g.Category</MudChip>
+                <div style="text-align: right;">
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(() => Delete(g))" />
+                </div>
+            </MudPaper>
+        </div>
+    }
+</div>
+
+@code {
+    private List<SecureShield.Domain.Entities.GalleryItem> _items = new();
+    private bool _showForm;
+    private SecureShield.Domain.Entities.GalleryItem _form = new();
+
+    protected override async Task OnInitializedAsync() => _items = (await Gallery.GetAllAsync()).ToList();
+
+    private void ShowAdd() { _form = new SecureShield.Domain.Entities.GalleryItem(); _showForm = true; }
+
+    private async Task Save()
+    {
+        await Gallery.AddAsync(_form);
+        await Uow.SaveChangesAsync();
+        _items.Add(_form);
+        _showForm = false;
+    }
+
+    private async Task Delete(SecureShield.Domain.Entities.GalleryItem g)
+    {
+        await Gallery.DeleteAsync(g.Id);
+        await Uow.SaveChangesAsync();
+        _items.Remove(g);
+    }
+}

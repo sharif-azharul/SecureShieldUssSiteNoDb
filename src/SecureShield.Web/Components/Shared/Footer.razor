@@ -1,0 +1,77 @@
+@using SecureShield.Application.Services
+@inject ILocalizationService L
+
+<footer class="site-footer">
+    <div class="footer-cta">
+        <div class="container-pad" style="display: flex; flex-wrap: wrap; gap: 24px; align-items: center; justify-content: space-between;">
+            <div>
+                <h3>@L["footer.ctaTitle"]</h3>
+                <p>@L["footer.ctaSub"]</p>
+            </div>
+            <a href="#contact" class="btn-gold">@L["footer.ctaButton"] →</a>
+        </div>
+    </div>
+    <div class="container-pad footer-grid">
+        <div>
+            <img src="/uss-logo.svg" alt="USS Security Services Ltd." class="footer-brand" style="filter: brightness(0) invert(1);" />
+            <p class="footer-about">@L["footer.about"]</p>
+            <div style="display: flex; gap: 10px; margin-top: 24px;">
+                <a href="https://facebook.com" target="_blank" class="social-icon">f</a>
+                <a href="https://linkedin.com" target="_blank" class="social-icon">in</a>
+                <a href="https://youtube.com" target="_blank" class="social-icon">▶</a>
+                <a href="https://wa.me/8801700000222" target="_blank" class="social-icon">✆</a>
+            </div>
+        </div>
+        <div>
+            <h4 class="footer-h4">@L["footer.quickLinks"]</h4>
+            <div class="footer-divider-gold"></div>
+            <ul class="footer-links">
+                <li><a href="#about">@L["nav.about"]</a></li>
+                <li><a href="#public-services">@L["nav.services"]</a></li>
+                <li><a href="#process">@L["nav.process"]</a></li>
+                <li><a href="#public-guards">@L["nav.guards"]</a></li>
+                <li><a href="#training">@L["nav.training"]</a></li>
+                <li><a href="#gallery">@L["nav.gallery"]</a></li>
+                <li><a href="#career">@L["nav.career"]</a></li>
+                <li><a href="#contact">@L["nav.contact"]</a></li>
+            </ul>
+        </div>
+        <div>
+            <h4 class="footer-h4">@L["footer.services"]</h4>
+            <div class="footer-divider-gold"></div>
+            <ul class="footer-links">
+                <li><a href="#public-services">🛡️ @L.T("Industrial Security", "শিল্প নিরাপত্তা")</a></li>
+                <li><a href="#public-services">🏢 @L.T("Corporate Security", "কর্পোরেট নিরাপত্তা")</a></li>
+                <li><a href="#public-services">🏦 @L.T("Bank Security", "ব্যাংক নিরাপত্তা")</a></li>
+                <li><a href="#public-services">🏥 @L.T("Hospital Security", "হাসপাতাল নিরাপত্তা")</a></li>
+                <li><a href="#public-services">👑 @L.T("VIP Protection", "ভিআইপি সুরক্ষা")</a></li>
+                <li><a href="#public-services">🔥 @L.T("Fire Safety Personnel", "অগ্নি নিরাপত্তা কর্মী")</a></li>
+                <li><a href="#public-services">📹 @L.T("CCTV Monitoring", "সিসিটিভি মনিটরিং")</a></li>
+                <li><a href="#public-services">👮 @L.T("Bodyguard Service", "বডিগার্ড সেবা")</a></li>
+            </ul>
+        </div>
+        <div>
+            <h4 class="footer-h4">@L["footer.contactUs"]</h4>
+            <div class="footer-divider-gold"></div>
+            <ul class="footer-contact">
+                <li><span class="ico">📍</span> @L["contact.info.addressVal"]</li>
+                <li><span class="ico">📞</span> @L["header.phone"]</li>
+                <li><span class="ico">✉</span> @L["header.email"]</li>
+                <li><span class="ico">💬</span> @L.T("WhatsApp: +880 1700-000222", "হোয়াটসঅ্যাপ: +880 1700-000222")</li>
+                <li><span class="ico">⏰</span> @L["contact.info.hoursVal"]</li>
+            </ul>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <div class="container-pad">
+            <div>© @DateTime.Now.Year @L["brand.full"]. @L["footer.rights"]</div>
+            <div style="display: flex; gap: 16px;">
+                <a href="#">@L["footer.privacy"]</a>
+                <span style="opacity: 0.3;">|</span>
+                <a href="#">@L["footer.terms"]</a>
+                <span style="opacity: 0.3;">|</span>
+                <a href="/admin/login">@L["nav.admin"]</a>
+            </div>
+        </div>
+    </div>
+</footer>

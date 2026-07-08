@@ -1,0 +1,31 @@
+@using SecureShield.Application.Interfaces
+@using SecureShield.Application.Services
+@inject IIndustryRepository Industriess
+@inject ILocalizationService L
+
+<section id="industries" class="section-pad section-dark">
+    <div class="container-pad">
+        <div class="section-heading" style="text-align: center; max-width: 760px; margin: 0 auto 60px;" data-reveal>
+            <div class="heading-label center"><span class="label-line"></span><span class="label-text">@L["industries.label"]</span><span class="label-line"></span></div>
+            <h2 class="heading-title">@L["industries.title"]</h2>
+            <p class="heading-sub" style="margin-left: auto; margin-right: auto;">@L["industries.sub"]</p>
+            <div class="heading-divider center"></div>
+        </div>
+        <div class="grid-4" data-reveal>
+            @foreach (var ind in _industries)
+            {
+                <article class="industry-card">
+                    <div class="card-icon-gold">@GetIconEmoji(ind.Icon)</div>
+                    <h3>@L.T(ind.TitleEn, ind.TitleBn)</h3>
+                    <p>@L.T(ind.DescriptionEn, ind.DescriptionBn)</p>
+                </article>
+            }
+        </div>
+    </div>
+</section>
+
+@code {
+    private IEnumerable<SecureShield.Domain.Entities.Industry> _industries = new List<SecureShield.Domain.Entities.Industry>();
+    protected override async Task OnInitializedAsync() => _industries = await Industriess.GetAllAsync();
+    private string GetIconEmoji(string icon) => icon switch { "Shirt" => "👕", "Banknote" => "💳", "Stethoscope" => "🩺", "Hotel" => "🏨", "Building" => "🏢", "ShoppingBag" => "🛍️", "GraduationCap" => "🎓", "Factory" => "🏭", "Warehouse" => "📦", "HeartHandshake" => "🤝", "Landmark" => "🏛️", "Home" => "🏠", _ => "🏢" };
+}

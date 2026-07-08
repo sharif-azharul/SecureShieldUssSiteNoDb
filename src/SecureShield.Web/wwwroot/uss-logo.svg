@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 64" width="200" height="64">
+  <defs>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E0BE6A"/>
+      <stop offset="50%" stop-color="#C8A23A"/>
+      <stop offset="100%" stop-color="#A57C1B"/>
+    </linearGradient>
+    <linearGradient id="blackGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1a1a1a"/>
+      <stop offset="100%" stop-color="#000000"/>
+    </linearGradient>
+  </defs>
+  <!-- Shield -->
+  <path d="M32 4 L56 12 L56 30 C56 44 46 54 32 60 C18 54 8 44 8 30 L8 12 Z"
+        fill="url(#blackGrad)" stroke="url(#goldGrad)" stroke-width="2"/>
+  <!-- Inner shield -->
+  <path d="M32 10 L50 16 L50 30 C50 41 42 49 32 54 C22 49 14 41 14 30 L14 16 Z"
+        fill="none" stroke="#C8A23A" stroke-width="0.5" opacity="0.5"/>
+  <!-- USS monogram -->
+  <text x="32" y="36" text-anchor="middle" font-family="Poppins, Arial, sans-serif"
+        font-size="18" font-weight="800" fill="url(#goldGrad)" letter-spacing="1">USS</text>
+  <text x="32" y="46" text-anchor="middle" font-family="Poppins, Arial, sans-serif"
+        font-size="5" font-weight="600" fill="#C8A23A" letter-spacing="2">SECURITY</text>
+  <!-- Top crown line -->
+  <line x1="14" y1="14" x2="50" y2="14" stroke="#C8A23A" stroke-width="0.5" opacity="0.6"/>
+  <!-- Company name -->
+  <text x="70" y="26" font-family="Poppins, Arial, sans-serif" font-size="18" font-weight="800" fill="#111111" letter-spacing="0.5">
+    USS <tspan fill="#C8A23A">Security</tspan>
+  </text>
+  <text x="70" y="42" font-family="Inter, Arial, sans-serif" font-size="9" font-weight="500" fill="#666666" letter-spacing="3">
+    SERVICES LTD.
+  </text>
+  <text x="70" y="54" font-family="Inter, Arial, sans-serif" font-size="7" font-weight="400" fill="#999999" letter-spacing="1.5">
+    YOUR SECURITY · OUR COMMITMENT
+  </text>
+</svg>

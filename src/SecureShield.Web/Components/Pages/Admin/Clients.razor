@@ -1,0 +1,68 @@
+@page "/admin/clients"
+@layout AdminLayout
+@using SecureShield.Application.Interfaces
+@inject IClientRepository Clientss
+@inject IUnitOfWork Uow
+
+<MudText Typo="Typo.h4" Style="color: #0B1F3A; font-weight: 700;">Manage Clients (@_items.Count)</MudText>
+<MudButton Variant="Variant.Filled" Color="Color.Primary" Class="mt-4" OnClick="@ShowAdd">+ Add New</MudButton>
+
+@if (_showForm)
+{
+    <MudPaper Class="pa-5 mt-4" Elevation="2" Style="border-radius: 16px;">
+        <MudText Typo="Typo.h6" Style="color: #0B1F3A; font-weight: 700;">New Client</MudText>
+        <div class="row g-3 mt-2">
+            <div class="col-md-6"><MudTextField Label="Name" @bind-Value="_form.Name" Variant="Variant.Outlined" /></div>
+            <div class="col-md-6"><MudTextField Label="Logo Text" @bind-Value="_form.Logo" Variant="Variant.Outlined" /></div>
+            <div class="col-md-6"><MudTextField Label="Order" @bind-Value="_form.Order" Variant="Variant.Outlined" /></div>
+        </div>
+        <div class="mt-3">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@Save">Save</MudButton>
+            <MudButton Variant="Variant.Text" OnClick="@(() => _showForm = false)">Cancel</MudButton>
+        </div>
+    </MudPaper>
+}
+
+<div class="row g-3 mt-2">
+    @foreach (var c in _items)
+    {
+        <div class="col-md-4 col-lg-3">
+            <MudPaper Class="pa-4" Elevation="2" Style="border-radius: 16px; height: 100%; text-align: center;">
+                <div style="display: flex; justify-content: flex-end;">
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(() => Delete(c))" />
+                </div>
+                <div style="font-family: 'Playfair Display', serif; font-weight: 700; color: #0B1F3A; font-size: 18px;">@c.Logo</div>
+                <MudText Typo="Typo.caption" Color="Color.Surface">@c.Name</MudText>
+            </MudPaper>
+        </div>
+    }
+</div>
+
+@code {
+    private List<SecureShield.Domain.Entities.Client> _items = new();
+    private bool _showForm;
+    private SecureShield.Domain.Entities.Client _form = new();
+
+    protected override async Task OnInitializedAsync() => _items = (await Clientss.GetAllAsync()).ToList();
+
+    private void ShowAdd()
+    {
+        _form = new SecureShield.Domain.Entities.Client { Order = _items.Count + 1 };
+        _showForm = true;
+    }
+
+    private async Task Save()
+    {
+        await Clientss.AddAsync(_form);
+        await Uow.SaveChangesAsync();
+        _items.Add(_form);
+        _showForm = false;
+    }
+
+    private async Task Delete(SecureShield.Domain.Entities.Client c)
+    {
+        await Clientss.DeleteAsync(c.Id);
+        await Uow.SaveChangesAsync();
+        _items.Remove(c);
+    }
+}

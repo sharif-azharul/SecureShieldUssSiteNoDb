@@ -1,0 +1,6 @@
+@using SecureShield.Application.Services
+@inject ILocalizationService L
+<button class="lang-toggle" onclick="window.ussToggleLang()" title="Switch language">
+    <span class="globe">🌐</span>
+    <span class="label">@(L.IsBn ? "English" : "বাংলা")</span>
+</button>

@@ -1,0 +1,52 @@
+@page "/admin/seo"
+@layout AdminLayout
+@using SecureShield.Application.Interfaces
+@inject ISiteSettingRepository Settings
+@inject IUnitOfWork Uow
+
+<MudText Typo="Typo.h4" Style="color: #0B1F3A; font-weight: 700;">SEO Settings</MudText>
+<MudText Typo="Typo.body1" Color="Color.Surface" Class="mb-4">Title, description, keywords for search engines.</MudText>
+
+@foreach (var s in _items)
+{
+    <MudPaper Class="pa-4 mt-3" Elevation="2" Style="border-radius: 12px;">
+        <MudText Typo="Typo.caption" Style="color: #5B6878; text-transform: uppercase; letter-spacing: 1px;">@s.Key.Replace("seo.", "")</MudText>
+        <div style="display: flex; gap: 8px; margin-top: 8px;">
+            @if (s.Key == "seo.description" || s.Key == "seo.keywords")
+            {
+                <MudTextArea Value="@s.Value"
+             ValueChanged="@(async (string? v) =>
+             {
+                 s.Value = v ?? string.Empty;
+             })"
+             Lines="3" />
+            }
+            else
+            {
+                <MudTextField Value="@s.Value"
+                              ValueChanged="@(async (string? v) =>
+                                            {
+                                                s.Value = v ?? string.Empty;
+                                            })"
+                              Variant="Variant.Outlined" />
+            }
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => Save(s))">Save</MudButton>
+        </div>
+    </MudPaper>
+}
+
+@code {
+    private List<SecureShield.Domain.Entities.SiteSetting> _items = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var all = await Settings.GetAllAsync();
+        _items = all.Where(s => s.Key.StartsWith("seo.")).ToList();
+    }
+
+    private async Task Save(SecureShield.Domain.Entities.SiteSetting s)
+    {
+        await Settings.UpsertAsync(s.Key, s.Value);
+        await Uow.SaveChangesAsync();
+    }
+}

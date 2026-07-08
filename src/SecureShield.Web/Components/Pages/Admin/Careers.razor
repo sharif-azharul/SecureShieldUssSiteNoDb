@@ -1,0 +1,71 @@
+@page "/admin/careers"
+@layout AdminLayout
+@using SecureShield.Application.Interfaces
+@inject ICareerRepository Careerss
+@inject IUnitOfWork Uow
+
+<MudText Typo="Typo.h4" Style="color: #0B1F3A; font-weight: 700;">Career Applications (@_items.Count)</MudText>
+
+@foreach (var c in _items)
+{
+    <MudPaper Class="pa-5 mt-4" Elevation="2" Style="border-radius: 16px;">
+        <div style="display: flex; flex-wrap: wrap; gap: 16px; justify-content: space-between; align-items: flex-start;">
+            <div style="flex: 1; min-width: 0;">
+                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                    <MudText Typo="Typo.h6" Style="color: #0B1F3A; font-weight: 700;">@c.Name</MudText>
+                    <MudChip T="string" Color="@GetColor(c.Status)" Size="Size.Small">
+                        @c.Status
+                    </MudChip>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; font-size: 14px; color: #5B6878;">
+                    <span>📞 @c.Phone</span>
+                    <span>✉ @c.Email</span>
+                    <span><strong style="color:#0B1F3A;">Position:</strong> @c.Position</span>
+                    <span><strong style="color:#0B1F3A;">Education:</strong> @c.Education</span>
+                    <span><strong style="color:#0B1F3A;">Experience:</strong> @c.Experience</span>
+                    <span><strong style="color:#0B1F3A;">CV:</strong> @(c.CvFileName ?? "—")</span>
+                </div>
+                <MudText Typo="Typo.caption" Color="Color.Surface" Class="mt-2">@c.Address</MudText>
+                <MudText Typo="Typo.caption" Style="color: #9CA3AF;">@c.CreatedAt.ToLocalTime().ToString("g")</MudText>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+                <MudSelect T="string" Label="Status" Value="@c.Status" ValueChanged="@((v) => UpdateStatus(c, v))" Variant="Variant.Outlined" Dense="true">
+                    <MudSelectItem Value="@("new")">New</MudSelectItem>
+                    <MudSelectItem Value="@("reviewed")">Reviewed</MudSelectItem>
+                    <MudSelectItem Value="@("shortlisted")">Shortlisted</MudSelectItem>
+                    <MudSelectItem Value="@("rejected")">Rejected</MudSelectItem>
+                </MudSelect>
+                <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="@(() => Delete(c))" Size="Size.Small">Delete</MudButton>
+            </div>
+        </div>
+    </MudPaper>
+}
+
+@code {
+    private List<SecureShield.Domain.Entities.CareerApplication> _items = new();
+
+    protected override async Task OnInitializedAsync() => _items = (await Careerss.GetAllAsync()).ToList();
+
+    private Color GetColor(string status) => status switch
+    {
+        "new" => Color.Warning,
+        "reviewed" => Color.Info,
+        "shortlisted" => Color.Success,
+        "rejected" => Color.Error,
+        _ => Color.Default
+    };
+
+    private async Task UpdateStatus(SecureShield.Domain.Entities.CareerApplication app, string status)
+    {
+        app.Status = status;
+        await Careerss.UpdateAsync(app);
+        await Uow.SaveChangesAsync();
+    }
+
+    private async Task Delete(SecureShield.Domain.Entities.CareerApplication app)
+    {
+        await Careerss.DeleteAsync(app.Id);
+        await Uow.SaveChangesAsync();
+        _items.Remove(app);
+    }
+}

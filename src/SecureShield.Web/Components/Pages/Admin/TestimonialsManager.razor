@@ -1,0 +1,70 @@
+@page "/admin/testimonials"
+@layout AdminLayout
+@using SecureShield.Application.Interfaces
+@inject ITestimonialRepository Testimonials
+@inject IUnitOfWork Uow
+
+<MudText Typo="Typo.h4" Style="color: #0B1F3A; font-weight: 700;">Manage Testimonials (@_items.Count)</MudText>
+<MudButton Variant="Variant.Filled" Color="Color.Primary" Class="mt-4" OnClick="@ShowAdd">+ Add New</MudButton>
+
+@if (_showForm)
+{
+    <MudPaper Class="pa-5 mt-4" Elevation="2" Style="border-radius: 16px;">
+        <MudText Typo="Typo.h6" Style="color: #0B1F3A; font-weight: 700;">New Testimonial</MudText>
+        <div class="row g-3 mt-2">
+            <div class="col-md-6"><MudTextField Label="Name" @bind-Value="_form.Name" Variant="Variant.Outlined" /></div>
+            <div class="col-md-6"><MudTextField Label="Company" @bind-Value="_form.Company" Variant="Variant.Outlined" /></div>
+            <div class="col-md-6"><MudTextField Label="Role" @bind-Value="_form.Role" Variant="Variant.Outlined" /></div>
+            <div class="col-md-6"><MudNumericField Label="Rating (1-5)" @bind-Value="_form.Rating" Min="1" Max="5" Variant="Variant.Outlined" /></div>
+            <div class="col-12"><MudTextField @bind-Value="_form.Message" Variant="Variant.Outlined" Rows="3" /></div>
+        </div>
+        <div class="mt-3">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@Save">Save</MudButton>
+            <MudButton Variant="Variant.Text" OnClick="@(() => _showForm = false)">Cancel</MudButton>
+        </div>
+    </MudPaper>
+}
+
+<div class="row g-3 mt-2">
+    @foreach (var t in _items)
+    {
+        <div class="col-md-6">
+            <MudPaper Class="pa-4" Elevation="2" Style="border-radius: 16px; height: 100%;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div>
+                        <div style="color: #C89B3C;">@(new string('⭐', t.Rating))</div>
+                        <MudText Typo="Typo.subtitle1" Style="color: #0B1F3A; font-weight: 700;">@t.Name</MudText>
+                        <MudText Typo="Typo.caption" Color="Color.Surface">@t.Role, @t.Company</MudText>
+                    </div>
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(() => Delete(t))" />
+                </div>
+                <MudText Typo="Typo.body2" Color="Color.Surface" Class="mt-2" Style="font-style: italic;">"@t.Message"</MudText>
+            </MudPaper>
+        </div>
+    }
+</div>
+
+@code {
+    private List<SecureShield.Domain.Entities.Testimonial> _items = new();
+    private bool _showForm;
+    private SecureShield.Domain.Entities.Testimonial _form = new();
+
+    protected override async Task OnInitializedAsync() => _items = (await Testimonials.GetAllAsync()).ToList();
+
+    private void ShowAdd() { _form = new SecureShield.Domain.Entities.Testimonial { Rating = 5 }; _showForm = true; }
+
+    private async Task Save()
+    {
+        await Testimonials.AddAsync(_form);
+        await Uow.SaveChangesAsync();
+        _items.Add(_form);
+        _showForm = false;
+    }
+
+    private async Task Delete(SecureShield.Domain.Entities.Testimonial t)
+    {
+        await Testimonials.DeleteAsync(t.Id);
+        await Uow.SaveChangesAsync();
+        _items.Remove(t);
+    }
+}

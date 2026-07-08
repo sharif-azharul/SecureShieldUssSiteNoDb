@@ -1,0 +1,34 @@
+@inherits LayoutComponentBase
+@using MudBlazor
+@using SecureShield.Web.Components.Shared
+@using SecureShield.Application.Services
+@using Microsoft.AspNetCore.WebUtilities
+@inject NavigationManager Nav
+@inject ILocalizationService L
+
+<MudThemeProvider />
+<MudSnackbarProvider />
+
+<div class="site-root" style="display: flex; flex-direction: column; min-height: 100vh; background: #F8F9FA;">
+    <Header />
+    <main style="flex: 1;">
+        @Body
+    </main>
+    <Footer />
+</div>
+
+@code {
+    protected override void OnInitialized()
+    {
+        // Read ?lang= query parameter from URL SERVER-SIDE before any child renders
+        var uri = Nav.ToAbsoluteUri(Nav.Uri);
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("lang", out var langParam))
+        {
+            var lang = langParam.ToString();
+            if (lang == "en" || lang == "bn")
+            {
+                L.SetLang(lang);
+            }
+        }
+    }
+}

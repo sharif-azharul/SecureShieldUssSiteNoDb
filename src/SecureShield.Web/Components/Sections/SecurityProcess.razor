@@ -1,0 +1,23 @@
+@using SecureShield.Application.Services
+@inject ILocalizationService L
+
+<section id="process" class="section-pad process-section">
+    <div class="container-pad">
+        <div class="section-heading" style="text-align: center; max-width: 760px; margin: 0 auto 60px;" data-reveal>
+            <div class="heading-label center"><span class="label-line"></span><span class="label-text">@L["process.label"]</span><span class="label-line"></span></div>
+            <h2 class="heading-title">@L["process.title"]</h2>
+            <p class="heading-sub" style="margin-left: auto; margin-right: auto;">@L["process.sub"]</p>
+            <div class="heading-divider center"></div>
+        </div>
+        <div class="process-grid" data-reveal>
+            @for (var i = 1; i <= 5; i++) { var num = i.ToString("00");
+                <div class="process-step">
+                    <div class="process-num">@num</div>
+                    <h4>@L[$"process.step{i}.title"]</h4>
+                    <p>@L[$"process.step{i}.desc"]</p>
+                    @if (i != 5) { <div class="process-arrow">→</div> }
+                </div>
+            }
+        </div>
+    </div>
+</section>

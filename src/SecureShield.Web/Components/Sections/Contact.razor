@@ -1,0 +1,195 @@
+@using Microsoft.AspNetCore.Components.Forms
+@using SecureShield.Application.DTOs
+@using SecureShield.Application.Services
+@using FluentValidation
+@inject IContactMessageRepository Messages
+@inject IEmailService Email
+@inject IRecaptchaService Recaptcha
+@inject IUnitOfWork Uow
+@inject IConfiguration Config
+@inject IValidator<ContactMessageDto> Validator
+@inject ILocalizationService L
+
+<section id="contact" class="section-pad">
+    <div class="container-pad">
+        <div class="section-heading" style="text-align: center; max-width: 760px; margin: 0 auto 60px;" data-reveal>
+            <div class="heading-label center">
+                <span class="label-line"></span>
+                <span class="label-text">@L["contact.label"]</span>
+                <span class="label-line"></span>
+            </div>
+            <h2 class="heading-title">@L["contact.title"]</h2>
+            <p class="heading-sub" style="margin-left: auto; margin-right: auto;">
+                @L["contact.sub"]
+            </p>
+            <div class="heading-divider center"></div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-6" data-reveal-left>
+                <div class="row g-3">
+                    @foreach (var info in _info)
+                    {
+                        <div class="col-sm-6">
+                            <div class="info-card">
+                                <div class="ico">@info.Icon</div>
+                                <div>
+                                    <div class="lbl">@L[info.LabelKey]</div>
+                                    <div class="val">@L[info.ValueKey]</div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+                <div style="margin-top: 16px; overflow: hidden; border-radius: 12px; box-shadow: var(--shadow-md); border-top: 3px solid var(--gold);">
+                    <iframe title="Office location"
+                            src="https://www.openstreetmap.org/export/embed.html?bbox=90.408%2C23.780%2C90.420%2C23.788&layer=mapnik&marker=23.784%2C90.414"
+                            style="height: 280px; width: 100%; border: 0;" loading="lazy"></iframe>
+                </div>
+            </div>
+            <div class="col-lg-6" data-reveal>
+                <EditForm Model="@_model" OnValidSubmit="@Submit">
+                    <DataAnnotationsValidator />
+                    <div class="form-card form-card-dark">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px;">
+                            <img src="/uss-logo.svg" alt="USS" style="height: 40px; filter: brightness(0) invert(1);" />
+                        </div>
+                        <h3 style="color: white; margin: 0 0 4px; font-family: var(--font-head);">@L["contact.form.title"]</h3>
+                        <p style="color: rgba(255,255,255,0.6); font-size: 14px; margin: 0 0 28px;">@L["contact.form.reply"]</p>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">@L["contact.form.name"] *</label>
+                                <InputText class="form-input" @bind-Value="_model.Name" placeholder="Your name" />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">@L["contact.form.company"]</label>
+                                <InputText class="form-input" @bind-Value="_model.Company" placeholder="Company name" />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">@L["contact.form.phone"] *</label>
+                                <InputText class="form-input" @bind-Value="_model.Phone" placeholder="01XXXXXXXXX" />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">@L["contact.form.email"] *</label>
+                                <InputText class="form-input" @bind-Value="_model.Email" placeholder="you@example.com" />
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">@L["contact.form.subject"] *</label>
+                                <InputText class="form-input" @bind-Value="_model.Subject" placeholder="How can we help?" />
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">@L["contact.form.message"] *</label>
+                                <InputTextArea class="form-input" @bind-Value="_model.Message" rows="4" placeholder="Write your message..." />
+                            </div>
+                        </div>
+                        <div style="margin-top: 16px; padding: 10px 14px; background: rgba(200,162,58,0.08); border-radius: 8px; font-size: 12px; color: var(--gold); border: 1px solid rgba(200,162,58,0.2);">
+                            @L["contact.form.recaptcha"]
+                        </div>
+                        <div style="margin-top: 20px; display: flex; gap: 12px; flex-wrap: wrap;">
+                            <button type="submit" class="btn-gold" style="flex: 1; justify-content: center;" disabled="@_loading">
+                                @(_loading ? "..." : $"{L["contact.form.send"]} →")
+                            </button>
+                            <button type="button" @onclick="@Clear" style="border: 2px solid var(--gold); background: transparent; color: var(--gold); padding: 12px 24px; border-radius: 24px; font-weight: 700; font-family: var(--font-head); cursor: pointer;">@L["contact.form.clear"]</button>
+                        </div>
+                        @if (!string.IsNullOrEmpty(_statusMessage))
+                        {
+                            <div style="margin-top: 16px; padding: 14px 18px; border-radius: 10px; background: @(_success ? "rgba(46,125,50,0.15)" : "rgba(198,40,40,0.15)"); color: white; font-size: 14px; border-left: 3px solid @(_success ? "var(--success)" : "var(--danger)");">
+                                @_statusMessage
+                            </div>
+                        }
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+</section>
+
+@code {
+    private ContactMessageDto _model = new ContactMessageDto();
+    private bool _loading;
+    private string? _statusMessage;
+    private bool _success;
+
+    private record Info(string Icon, string LabelKey, string ValueKey);
+    private readonly List<Info> _info = new()
+    {
+        new("📍", "contact.info.address", "contact.info.addressVal"),
+        new("📞", "contact.info.phone", "header.phone"),
+        new("✉", "contact.info.email", "header.email"),
+        new("💬", "contact.info.whatsapp", "contact.info.whatsapp"),
+        new("⏰", "contact.info.hours", "contact.info.hoursVal"),
+        new("🛡️", "contact.info.license", "contact.info.licenseVal"),
+    };
+
+    private void Clear()
+    {
+        _model = new ContactMessageDto();
+        _statusMessage = null;
+    }
+
+    private async Task Submit()
+    {
+        _loading = true;
+        try
+        {
+            var validation = await Validator.ValidateAsync(_model);
+            if (!validation.IsValid)
+            {
+                _statusMessage = string.Join("; ", validation.Errors.Select(e => e.ErrorMessage));
+                _success = false;
+                return;
+            }
+
+            var recaptchaToken = _model.RecaptchaToken ?? "dev-token";
+            var (recOk, _) = await Recaptcha.VerifyAsync(recaptchaToken);
+            if (!recOk)
+            {
+                _statusMessage = "reCAPTCHA verification failed. Please try again.";
+                _success = false;
+                return;
+            }
+
+            await Messages.AddAsync(new SecureShield.Domain.Entities.ContactMessage
+            {
+                Name = _model.Name,
+                Company = _model.Company,
+                Phone = _model.Phone,
+                Email = _model.Email,
+                Subject = _model.Subject,
+                Message = _model.Message,
+            });
+            await Uow.SaveChangesAsync();
+
+            var contactEmail = Config["Site:ContactEmail"] ?? "info@uss-security.com.bd";
+            var html = EmailTemplates.ContactNotification(_model.Name, _model.Company, _model.Phone, _model.Email, _model.Subject, _model.Message);
+            var (ok, err) = await Email.SendEmailAsync(
+                contactEmail,
+                "noreply@uss-security.com.bd",
+                _model.Email,
+                $"[Contact] {_model.Subject}",
+                $"Name: {_model.Name}\nCompany: {_model.Company ?? "—"}\nPhone: {_model.Phone}\nEmail: {_model.Email}\nSubject: {_model.Subject}\n\n{_model.Message}",
+                html);
+
+            if (ok)
+            {
+                _statusMessage = L["contact.success"];
+                _success = true;
+                _model = new ContactMessageDto();
+            }
+            else
+            {
+                _statusMessage = "Failed to send message: " + err;
+                _success = false;
+            }
+        }
+        catch (Exception ex)
+        {
+            _statusMessage = "Error: " + ex.Message;
+            _success = false;
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+}

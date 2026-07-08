@@ -1,0 +1,75 @@
+@page "/admin/services"
+@layout AdminLayout
+@using SecureShield.Application.Interfaces
+@inject IServiceRepository Servicess
+@inject IUnitOfWork Uow
+
+<MudText Typo="Typo.h4" Style="color: #0B1F3A; font-weight: 700;">Manage Services (@_items.Count)</MudText>
+<MudButton Variant="Variant.Filled" Color="Color.Primary" Class="mt-4" OnClick="@ShowAdd">+ Add New</MudButton>
+
+@if (_showForm)
+{
+    <MudPaper Class="pa-5 mt-4" Elevation="2" Style="border-radius: 16px;">
+        <MudText Typo="Typo.h6" Style="color: #0B1F3A; font-weight: 700;">New Service</MudText>
+        <div class="row g-3 mt-2">
+            <div class="col-md-6"><MudTextField Label="Slug" @bind-Value="_form.Slug" Variant="Variant.Outlined" /></div>
+            <div class="col-md-6"><MudTextField Label="Icon (emoji)" @bind-Value="_form.Icon" Variant="Variant.Outlined" /></div>
+            <div class="col-md-6"><MudTextField Label="Title (EN)" @bind-Value="_form.TitleEn" Variant="Variant.Outlined" /></div>
+            <div class="col-md-6"><MudTextField Label="Title (BN)" @bind-Value="_form.TitleBn" Variant="Variant.Outlined" /></div>
+            <div class="col-12"><MudTextField Label="Description (EN)" @bind-Value="_form.DescriptionEn" Variant="Variant.Outlined" Rows="2" /></div>
+            <div class="col-12"><MudTextField Label="Description (BN)" @bind-Value="_form.DescriptionBn" Variant="Variant.Outlined" Rows="2" /></div>
+            <div class="col-md-6"><MudTextField Label="Order" @bind-Value="_form.Order" Variant="Variant.Outlined" /></div>
+            <div class="col-md-6"><MudSwitch @bind-Value="_form.Featured" Label="Featured" /></div>
+        </div>
+        <div class="mt-3">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@Save">Save</MudButton>
+            <MudButton Variant="Variant.Text" OnClick="@(() => _showForm = false)">Cancel</MudButton>
+        </div>
+    </MudPaper>
+}
+
+<div class="row g-3 mt-2">
+    @foreach (var s in _items)
+    {
+        <div class="col-md-6 col-lg-4">
+            <MudPaper Class="pa-4" Elevation="2" Style="border-radius: 16px; height: 100%;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div style="font-size: 32px;">@s.Icon</div>
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(() => Delete(s))" />
+                </div>
+                <MudText Typo="Typo.h6" Style="color: #0B1F3A; font-weight: 700; margin-top: 8px;">@s.TitleEn</MudText>
+                <MudText Typo="Typo.caption" Color="Color.Surface">@s.TitleBn</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Surface" Class="mt-2" Style="font-size: 13px;">@s.DescriptionEn</MudText>
+            </MudPaper>
+        </div>
+    }
+</div>
+
+@code {
+    private List<SecureShield.Domain.Entities.Service> _items = new();
+    private bool _showForm;
+    private SecureShield.Domain.Entities.Service _form = new();
+
+    protected override async Task OnInitializedAsync() => _items = (await Servicess.GetAllAsync()).ToList();
+
+    private void ShowAdd()
+    {
+        _form = new SecureShield.Domain.Entities.Service { Icon = "🛡️", Order = _items.Count + 1 };
+        _showForm = true;
+    }
+
+    private async Task Save()
+    {
+        await Servicess.AddAsync(_form);
+        await Uow.SaveChangesAsync();
+        _items.Add(_form);
+        _showForm = false;
+    }
+
+    private async Task Delete(SecureShield.Domain.Entities.Service s)
+    {
+        await Servicess.DeleteAsync(s.Id);
+        await Uow.SaveChangesAsync();
+        _items.Remove(s);
+    }
+}
